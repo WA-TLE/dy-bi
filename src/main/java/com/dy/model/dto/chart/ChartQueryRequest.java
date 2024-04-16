@@ -1,32 +1,45 @@
-package com.dy.model.entity;
+package com.dy.model.dto.chart;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.dy.common.PageRequest;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * 帖子点赞
+ * 查询请求
  *
 
  */
-@TableName(value = "post_thumb")
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class PostThumb implements Serializable {
+public class ChartQueryRequest extends PageRequest implements Serializable {
 
     /**
      * id
      */
-    @TableId(type = IdType.AUTO)
+
     private Long id;
 
     /**
-     * 帖子 id
+     * 分析目标
      */
-    private Long postId;
+    private String goal;
+
+
+
+    /**
+     * 图表类型
+     */
+    private String chartType;
+
+    /**
+     * 生成分析结论
+     */
+    private String genChart;
 
     /**
      * 创建用户 id
@@ -43,6 +56,5 @@ public class PostThumb implements Serializable {
      */
     private Date updateTime;
 
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

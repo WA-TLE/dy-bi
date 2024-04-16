@@ -1,8 +1,8 @@
 package com.dy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dy.model.dto.post.PostQueryRequest;
-import com.dy.model.entity.Post;
+import com.dy.model.dto.chart.ChartQueryRequest;
+
 import javax.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class PostServiceTest {
 
     @Test
     void searchFromEs() {
-        PostQueryRequest postQueryRequest = new PostQueryRequest();
+        ChartQueryRequest postQueryRequest = new ChartQueryRequest();
         postQueryRequest.setUserId(1L);
         Page<Post> postPage = postService.searchFromEs(postQueryRequest);
         Assertions.assertNotNull(postPage);

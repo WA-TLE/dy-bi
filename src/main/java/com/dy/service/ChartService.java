@@ -1,7 +1,11 @@
 package com.dy.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.dy.model.dto.chart.ChartQueryRequest;
+import com.dy.model.dto.user.UserQueryRequest;
 import com.dy.model.entity.Chart;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dy.model.entity.User;
 
 /**
 * @author 微光
@@ -9,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-04-16 20:26:47
 */
 public interface ChartService extends IService<Chart> {
-
+    QueryWrapper<User> getQueryWrapper(ChartQueryRequest chartQueryRequest);
 }

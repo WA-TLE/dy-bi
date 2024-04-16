@@ -1,9 +1,8 @@
 package com.dy.esdao;
 
 import com.dy.model.dto.post.PostEsDTO;
-import com.dy.model.dto.post.PostQueryRequest;
-import com.dy.model.entity.Post;
-import com.dy.service.PostService;
+import com.dy.model.dto.chart.ChartQueryRequest;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,7 @@ public class PostEsDaoTest {
 
     @Test
     void test() {
-        PostQueryRequest postQueryRequest = new PostQueryRequest();
+        ChartQueryRequest postQueryRequest = new ChartQueryRequest();
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<Post> page =
                 postService.searchFromEs(postQueryRequest);
         System.out.println(page);
