@@ -28,7 +28,7 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
 
 
     @Override
-    public QueryWrapper<User> getQueryWrapper(ChartQueryRequest chartQueryRequest) {
+    public QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest) {
         if (chartQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
@@ -36,11 +36,13 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
         Long id = chartQueryRequest.getId();
         String goal = chartQueryRequest.getGoal();
         String chartType = chartQueryRequest.getChartType();
+        String name = chartQueryRequest.getName();
         Long userId = chartQueryRequest.getUserId();
         String sortField = chartQueryRequest.getSortField();
         String sortOrder = chartQueryRequest.getSortOrder();
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<Chart> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
+        queryWrapper.like(StringUtils.isNoneBlank(name), "name", name);
         queryWrapper.eq(StringUtils.isNotBlank(goal), "userRole", goal);
         queryWrapper.like(StringUtils.isNotBlank(chartType), "userProfile", chartType);
         queryWrapper.like(ObjectUtils.isNotEmpty(userId), "userName", userId);

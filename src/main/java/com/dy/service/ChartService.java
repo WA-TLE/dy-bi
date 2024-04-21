@@ -13,5 +13,5 @@ import com.dy.model.entity.User;
 * @createDate 2024-04-16 20:26:47
 */
 public interface ChartService extends IService<Chart> {
-    QueryWrapper<User> getQueryWrapper(ChartQueryRequest chartQueryRequest);
+    QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest);
 }

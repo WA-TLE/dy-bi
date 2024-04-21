@@ -9,26 +9,24 @@ import com.dy.common.ResultUtils;
 import com.dy.constant.UserConstant;
 import com.dy.exception.BusinessException;
 import com.dy.exception.ThrowUtils;
-import com.dy.model.dto.chart.ChartAddRequest;
-import com.dy.model.dto.chart.ChartEditRequest;
-import com.dy.model.dto.chart.ChartQueryRequest;
-import com.dy.model.dto.chart.ChartUpdateRequest;
+import com.dy.manager.CosManager;
+import com.dy.model.dto.chart.*;
 import com.dy.model.entity.Chart;
 import com.dy.model.entity.User;
 import com.dy.service.ChartService;
 import com.dy.service.UserService;
+import com.dy.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 帖子接口
- *
-
  */
 @RestController
 @RequestMapping("/chart")
@@ -40,6 +38,9 @@ public class ChartController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private CosManager cosManager;
 
     // region 增删改查
 
@@ -139,14 +140,14 @@ public class ChartController {
         return ResultUtils.success(chart);
     }
 
-/*
-    */
+    /*
+     */
 /**
-     * 分页获取列表（仅管理员）
-     *
-     * @param chartQueryRequest
-     * @return
-     *//*
+ * 分页获取列表（仅管理员）
+ *
+ * @param chartQueryRequest
+ * @return
+ */
 
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -157,8 +158,6 @@ public class ChartController {
                 chartService.getQueryWrapper(chartQueryRequest));
         return ResultUtils.success(chartPage);
     }
-*/
-
 
 
     // endregion
@@ -194,4 +193,43 @@ public class ChartController {
         return ResultUtils.success(result);
     }
 
+
+    /**
+     * 文件上传
+     *
+     * @param multipartFile
+     * @param chartFileRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/upload")
+    public BaseResponse<String> uploadFile(@RequestPart("file") MultipartFile multipartFile,
+                                           ChartFileRequest chartFileRequest, HttpServletRequest request) {
+
+        //  快速判断 Object 对象是否为 null
+        if (multipartFile == null || chartFileRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "上传文件为空");
+        }
+
+        String name = chartFileRequest.getName();
+        String goal = chartFileRequest.getGoal();
+        String chartType = chartFileRequest.getChartType();
+
+        //  分析目标为 null
+        ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(StringUtils.isNoneBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+
+        StringBuilder userInput = new StringBuilder();
+        userInput.append("你是一个数据分析师，接下来我会给你我的分析目标和原始数据，请告诉我分析结论。").append("\n");
+        userInput.append("分析目标:").append(goal).append("\n");
+
+        //   将 Excel 文件转换为 csv
+        String result = ExcelUtils.excelToCsv(multipartFile);
+        userInput.append("数据: ").append(result).append("\n");
+
+
+        return ResultUtils.success(userInput.toString());
+
+
+    }
 }

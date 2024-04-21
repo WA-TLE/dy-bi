@@ -16,7 +16,10 @@ import lombok.Data;
 @Data
 public class ChartAddRequest implements Serializable {
 
-
+    /**
+     * 图表名称
+     */
+    private String name;
 
     /**
      * 分析目标
