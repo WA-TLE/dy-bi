@@ -83,3 +83,7 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.dy.controller
+yuapi:
+  client:
+    access-key: ${secret.yuapi.client.access-key}
+    secret-key: ${secret.yuapi.client.secret-key}

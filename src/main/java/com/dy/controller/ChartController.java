@@ -9,10 +9,12 @@ import com.dy.common.ResultUtils;
 import com.dy.constant.UserConstant;
 import com.dy.exception.BusinessException;
 import com.dy.exception.ThrowUtils;
+import com.dy.manager.AIManager;
 import com.dy.manager.CosManager;
 import com.dy.model.dto.chart.*;
 import com.dy.model.entity.Chart;
 import com.dy.model.entity.User;
+import com.dy.model.vo.BiResponseVO;
 import com.dy.service.ChartService;
 import com.dy.service.UserService;
 import com.dy.utils.ExcelUtils;
@@ -41,6 +43,10 @@ public class ChartController {
 
     @Resource
     private CosManager cosManager;
+
+    @Resource
+    private AIManager aiManager;
+
 
     // region 增删改查
 
@@ -142,12 +148,13 @@ public class ChartController {
 
     /*
      */
-/**
- * 分页获取列表（仅管理员）
- *
- * @param chartQueryRequest
- * @return
- */
+
+    /**
+     * 分页获取列表（仅管理员）
+     *
+     * @param chartQueryRequest
+     * @return
+     */
 
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -203,13 +210,16 @@ public class ChartController {
      * @return
      */
     @PostMapping("/upload")
-    public BaseResponse<String> uploadFile(@RequestPart("file") MultipartFile multipartFile,
-                                           ChartFileRequest chartFileRequest, HttpServletRequest request) {
+    public BaseResponse<BiResponseVO> uploadFile(@RequestPart("file") MultipartFile multipartFile,
+                                                 ChartFileRequest chartFileRequest, HttpServletRequest request) {
 
         //  快速判断 Object 对象是否为 null
         if (multipartFile == null || chartFileRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "上传文件为空");
         }
+
+        User loginUser = userService.getLoginUser(request);
+
 
         String name = chartFileRequest.getName();
         String goal = chartFileRequest.getGoal();
@@ -220,16 +230,47 @@ public class ChartController {
         ThrowUtils.throwIf(StringUtils.isNoneBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
 
         StringBuilder userInput = new StringBuilder();
-        userInput.append("你是一个数据分析师，接下来我会给你我的分析目标和原始数据，请告诉我分析结论。").append("\n");
-        userInput.append("分析目标:").append(goal).append("\n");
+
+        userInput.append("分析需求:").append(goal).append("\n");
+
+        // TODO: 2024/4/22 补充图表类型
 
         //   将 Excel 文件转换为 csv
-        String result = ExcelUtils.excelToCsv(multipartFile);
-        userInput.append("数据: ").append(result).append("\n");
+        String csv = ExcelUtils.excelToCsv(multipartFile);
+        userInput.append("原始数据: ").append(csv).append("\n");
+
+        long biModelId = 1782312022953074689L;
+
+        String result = aiManager.doChat(biModelId, userInput.toString());
+
+        String[] split = result.split("@@@@@@");
+
+        ThrowUtils.throwIf(split.length < 3, ErrorCode.SYSTEM_ERROR, "图表数据分析错误");
+
+        String genChart = split[1].trim();
+        String genResult = split[2].trim();
 
 
-        return ResultUtils.success(userInput.toString());
 
 
+        //  将生成的图表保存到数据库
+        Chart chart = new Chart();
+        chart.setGoal(goal);
+        chart.setName(name);
+        chart.setChartData(csv);
+        chart.setChartType("折线图");  // TODO: 2024/4/22 图表类型更改
+        chart.setGenChart(genChart);
+        chart.setGenResult(genResult);
+        chart.setUserId(loginUser.getId());
+
+        boolean saveResult = chartService.save(chart);
+        ThrowUtils.throwIf(!saveResult, ErrorCode.SYSTEM_ERROR, "图表保存失败");
+
+        BiResponseVO biResponseVO = new BiResponseVO();
+        biResponseVO.setChartId(chart.getId());
+        biResponseVO.setGenResult(genResult);
+        biResponseVO.setGenChart(genChart);
+
+        return ResultUtils.success(biResponseVO);
     }
 }
