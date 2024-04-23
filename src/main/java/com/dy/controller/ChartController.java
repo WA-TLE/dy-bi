@@ -12,6 +12,7 @@ import com.dy.exception.BusinessException;
 import com.dy.exception.ThrowUtils;
 import com.dy.manager.AIManager;
 import com.dy.manager.CosManager;
+import com.dy.manager.RedissonManager;
 import com.dy.model.dto.chart.*;
 import com.dy.model.entity.Chart;
 import com.dy.model.entity.User;
@@ -29,6 +30,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.dy.constant.ChartConstant.GEN_CHART_BY_AI;
 
 /**
  * 帖子接口
@@ -55,6 +58,12 @@ public class ChartController {
 
     @Resource
     private AIManager aiManager;
+
+    /**
+     * 限流
+     */
+    @Resource
+    private RedissonManager redissonManager;
 
 
     // region 增删改查
@@ -247,6 +256,9 @@ public class ChartController {
         String suffix = FileUtil.getSuffix(originalFilename);
         final List<String> SECURE_SUFFIX = Arrays.asList("xlsx", "xlsm", "xlsb", "xltx");
         ThrowUtils.throwIf(!SECURE_SUFFIX.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀名非法!");
+
+        //  限流!!!
+        redissonManager.doRateLimit(GEN_CHART_BY_AI + loginUser.getId());
 
 
         StringBuilder userInput = new StringBuilder();
