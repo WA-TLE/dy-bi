@@ -1,5 +1,6 @@
 package com.dy.controller;
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dy.annotation.AuthCheck;
 import com.dy.common.BaseResponse;
@@ -26,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 帖子接口
@@ -34,6 +37,12 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/chart")
 @Slf4j
 public class ChartController {
+
+
+    /**
+     * 文件最大大小 1M
+     */
+    private final long FILE_MAX_SIZE = 1024 * 1024;;
 
     @Resource
     private ChartService chartService;
@@ -202,14 +211,14 @@ public class ChartController {
 
 
     /**
-     * 文件上传
+     * 智能分析
      *
      * @param multipartFile
      * @param chartFileRequest
      * @param request
      * @return
      */
-    @PostMapping("/upload")
+    @PostMapping("/gen")
     public BaseResponse<BiResponseVO> uploadFile(@RequestPart("file") MultipartFile multipartFile,
                                                  ChartFileRequest chartFileRequest, HttpServletRequest request) {
 
@@ -228,6 +237,17 @@ public class ChartController {
         //  分析目标为 null
         ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(StringUtils.isNoneBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+
+        //  校验用户上传的图表大小
+        long fileSize = multipartFile.getSize();
+        ThrowUtils.throwIf(fileSize > FILE_MAX_SIZE, ErrorCode.PARAMS_ERROR, "文件大小超过 1M");
+
+        //  校验文件后缀名
+        String originalFilename = multipartFile.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(originalFilename);
+        final List<String> SECURE_SUFFIX = Arrays.asList("xlsx", "xlsm", "xlsb", "xltx");
+        ThrowUtils.throwIf(!SECURE_SUFFIX.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀名非法!");
+
 
         StringBuilder userInput = new StringBuilder();
 

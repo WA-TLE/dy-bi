@@ -19,6 +19,7 @@ import java.util.Map;
 @SpringBootTest
 public class EasyExcelTest {
 
+    //  测试读取 Excel 文件
     @Test
     public void doImport() throws FileNotFoundException {
         File file = ResourceUtils.getFile("classpath:test_excel.xlsx");
