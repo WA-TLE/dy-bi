@@ -300,6 +300,7 @@ public class ChartController {
 
         BiResponseVO biResponseVO = new BiResponseVO();
         biResponseVO.setChartId(chart.getId());
+
         biResponseVO.setGenResult(genResult);
         biResponseVO.setGenChart(genChart);
 

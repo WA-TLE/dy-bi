@@ -8,6 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.ThreadFactory;
+
 /**
  * @Author: dy
  * @Date: 2024/4/23 19:22
@@ -19,13 +21,9 @@ import org.springframework.context.annotation.Configuration;
 public class RedissonConfig {
 
     private Integer database;
-
     private String host;
-
     private String port;
-
     private String password;
-
 
     @Bean
     public RedissonClient redissonClient() {
@@ -35,10 +33,6 @@ public class RedissonConfig {
                 .setAddress("redis://" + host + ":" + port)
                 .setDatabase(database)
                 .setPassword(password);
-
-
         return Redisson.create(config);
-
     }
-
 }
