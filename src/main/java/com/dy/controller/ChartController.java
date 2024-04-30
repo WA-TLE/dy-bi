@@ -14,6 +14,7 @@ import com.dy.model.dto.chart.*;
 import com.dy.model.entity.Chart;
 import com.dy.model.entity.User;
 import com.dy.model.vo.BiResponseVO;
+import com.dy.mq.MyMessageProducer;
 import com.dy.service.ChartService;
 import com.dy.service.UserService;
 import com.dy.utils.ExcelUtils;
@@ -31,6 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.dy.constant.ChartConstant.GEN_CHART_BY_AI;
+import static com.dy.constant.CommonConstant.BI_MODEL_ID;
 
 /**
  * 帖子接口
@@ -63,6 +65,9 @@ public class ChartController {
      */
     @Resource
     private RedissonManager redissonManager;
+
+    @Resource
+    private MyMessageProducer myMessageProducer;
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
@@ -428,6 +433,79 @@ public class ChartController {
 
         return ResultUtils.success(biResponseVO);
     }
+
+
+    @PostMapping("/gen/async/mq")
+    public BaseResponse<BiResponseVO> analyzeChartsAsynchronouslyByMq(@RequestPart("file") MultipartFile multipartFile,
+                                                                  ChartFileRequest chartFileRequest, HttpServletRequest request) {
+
+        //  快速判断 Object 对象是否为 null
+        if (multipartFile == null || chartFileRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "上传文件为空");
+        }
+
+        User loginUser = userService.getLoginUser(request);
+
+
+        String name = chartFileRequest.getName();
+        String goal = chartFileRequest.getGoal();
+        String chartType = chartFileRequest.getChartType();
+
+        //  分析目标为 null
+        ThrowUtils.throwIf(StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(StringUtils.isNoneBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+
+        //  校验用户上传的图表大小
+        long fileSize = multipartFile.getSize();
+        ThrowUtils.throwIf(fileSize > FILE_MAX_SIZE, ErrorCode.PARAMS_ERROR, "文件大小超过 1M");
+
+        //  校验文件后缀名
+        String originalFilename = multipartFile.getOriginalFilename();
+        String suffix = FileUtil.getSuffix(originalFilename);
+        final List<String> SECURE_SUFFIX = Arrays.asList("xlsx", "xlsm", "xlsb", "xltx");
+        ThrowUtils.throwIf(!SECURE_SUFFIX.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀名非法!");
+
+        //  每个用户一个限流器   限流!!!
+        redissonManager.doRateLimit(GEN_CHART_BY_AI + loginUser.getId());
+
+
+        StringBuilder userInput = new StringBuilder();
+
+        userInput.append("分析需求:").append(goal).append("\n");
+
+        // TODO: 2024/4/22 补充图表类型
+
+        //   将 Excel 文件转换为 csv
+        String csv = ExcelUtils.excelToCsv(multipartFile);
+        userInput.append("原始数据: ").append(csv).append("\n");
+
+        // TODO: 2024/4/26 适当优化位置
+        long biModelId = BI_MODEL_ID;
+
+        //  未分析以前, 将图表信息保存到数据库中, 设置状态为 wait
+        //  将生成的图表保存到数据库
+        Chart chart = new Chart();
+        chart.setGoal(goal);
+        chart.setName(name);
+        chart.setChartData(csv);
+        chart.setChartType("折线图");  // TODO: 2024/4/22 图表类型更改
+        chart.setUserId(loginUser.getId());
+        chart.setStatus(ChartStatus.WAIT.getStatus());
+        boolean saveChart = chartService.save(chart);
+        ThrowUtils.throwIf(!saveChart, ErrorCode.SYSTEM_ERROR, "保存图表等待状态失败"); //  ????
+
+
+
+        myMessageProducer.sendMessage(String.valueOf(chart.getId()));
+
+
+        BiResponseVO biResponseVO = new BiResponseVO();
+        biResponseVO.setChartId(chart.getId());
+
+        return ResultUtils.success(biResponseVO);
+    }
+
+
 
     private void handleChartUpdateError(long chartId, String execMessage) {
         Chart updateChart = new Chart();
