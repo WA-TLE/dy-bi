@@ -1,4 +1,5 @@
 package com.dy.service.impl;
+
 import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,13 +19,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 /**
-* @author 微光
-* @description 针对表【chart(图表信息表)】的数据库操作Service实现
-* @createDate 2024-04-16 20:26:47
-*/
+ * @author 微光
+ * @description 针对表【chart(图表信息表)】的数据库操作Service实现
+ * @createDate 2024-04-16 20:26:47
+ */
 @Service
 public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
-    implements ChartService {
+        implements ChartService {
 
 
     @Override
@@ -45,12 +46,12 @@ public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
         queryWrapper.like(StringUtils.isNoneBlank(name), "name", name);
         queryWrapper.eq(StringUtils.isNotBlank(goal), "userRole", goal);
         queryWrapper.like(StringUtils.isNotBlank(chartType), "userProfile", chartType);
-        queryWrapper.like(ObjectUtils.isNotEmpty(userId), "userName", userId);
+        queryWrapper.like(ObjectUtils.isNotEmpty(userId), "userId", userId);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
     }
-    
+
 
 }
 

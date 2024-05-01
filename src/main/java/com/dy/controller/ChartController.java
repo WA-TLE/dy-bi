@@ -1,9 +1,11 @@
 package com.dy.controller;
 
 import cn.hutool.core.io.FileUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dy.annotation.AuthCheck;
 import com.dy.common.*;
+import com.dy.constant.CommonConstant;
 import com.dy.constant.UserConstant;
 import com.dy.exception.BusinessException;
 import com.dy.exception.ThrowUtils;
@@ -18,7 +20,9 @@ import com.dy.mq.MyMessageProducer;
 import com.dy.service.ChartService;
 import com.dy.service.UserService;
 import com.dy.utils.ExcelUtils;
+import com.dy.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -192,6 +196,33 @@ public class ChartController {
     }
 
 
+    /**
+     * 分页获取列表（仅管理员）
+     *
+     * @param chartQueryRequest
+     * @return
+     */
+
+    @PostMapping("my/list/page")
+    public BaseResponse<Page<Chart>> myListChartByPage(@RequestBody ChartQueryRequest chartQueryRequest, HttpServletRequest request) {
+
+        //  判空
+        if (chartQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空!");
+        }
+
+
+        User loginUser = userService.getLoginUser(request);
+        chartQueryRequest.setUserId(loginUser.getId());
+
+
+
+        long current = chartQueryRequest.getCurrent();
+        long size = chartQueryRequest.getPageSize();
+        Page<Chart> chartPage = chartService.page(new Page<>(current, size),
+                chartService.getQueryWrapper(chartQueryRequest));
+        return ResultUtils.success(chartPage);
+    }
     // endregion
 
 
