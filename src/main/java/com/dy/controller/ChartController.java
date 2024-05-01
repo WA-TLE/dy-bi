@@ -1,6 +1,7 @@
 package com.dy.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dy.annotation.AuthCheck;
@@ -175,8 +176,22 @@ public class ChartController {
         return ResultUtils.success(chart);
     }
 
-    /*
-     */
+    @GetMapping("/get")
+    public BaseResponse<Chart> getChartById(long id, HttpServletRequest request) {
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR, "获取图表不存在");
+
+        Chart chart = chartService.getById(id);
+
+        ThrowUtils.throwIf(ObjectUtil.isNull(chart), ErrorCode.NOT_FOUND_ERROR);
+
+        return ResultUtils.success(chart);
+
+    }
+
+
+
+
+
 
     /**
      * 分页获取列表（仅管理员）

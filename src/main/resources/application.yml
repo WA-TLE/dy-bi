@@ -26,7 +26,7 @@ spring:
   # Redis 配置
   # todo 需替换配置，然后取消注释
   redis:
-    database: 1
+    database: 5
     host: ${secret.redis.host}
     port: ${secret.redis.port}
     timeout: 5000
@@ -52,7 +52,7 @@ spring:
     password: ${secret.rabbitmq.password} # 密码
 server:
   address: 0.0.0.0
-  port: 8080
+  port: 8128
   servlet:
     context-path: /api
     # cookie 30 天过期

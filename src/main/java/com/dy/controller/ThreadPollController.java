@@ -43,7 +43,7 @@ import static com.dy.constant.ChartConstant.GEN_CHART_BY_AI;
  * 帖子接口
  */
 @RestController
-@RequestMapping("/chart")
+@RequestMapping("/thread")
 @Slf4j
 @Profile({"dev", "local"})
 public class ThreadPollController {
