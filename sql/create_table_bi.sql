@@ -40,3 +40,22 @@ create table if not exists chart
     genResult   text                               null comment '分析图表得到的结论'
 )
     comment '图表信息表' collate = utf8mb4_unicode_ci;
+
+
+-- 图表信息表
+use dy_bi;
+create table if not exists ai_assistant
+(
+    id          bigint auto_increment comment 'id' primary key,
+    questionName        varchar(256)                       null comment '问题名称',
+    questionGoal        text                               null comment '问题概述',
+    questionResult   text                               null comment '问题结果',
+    questionType   varchar(128)                       null comment '问题类型',
+    questionStatus      varchar(128)                       not null default 'wait' comment 'wait, running, succeed, fail',
+    execMessage text                               null comment '执行信息',
+    userId      bigint                             not null comment '创建用户 id',
+    createTime  datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete    tinyint  default 0                 not null comment '是否删除'
+)
+    comment 'AI 问答助手信息表' collate = utf8mb4_unicode_ci;
