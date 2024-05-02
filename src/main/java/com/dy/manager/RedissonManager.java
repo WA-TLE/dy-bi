@@ -32,6 +32,7 @@ public class RedissonManager {
 
 
         if (!flag) {
+            log.info("我们进行限流!!!");
             //  获取令牌失败, 我们抛出异常
             throw new BusinessException(ErrorCode.TOO_MANY_REQUEST);
         }

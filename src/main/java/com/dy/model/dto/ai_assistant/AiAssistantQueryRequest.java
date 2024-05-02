@@ -14,9 +14,9 @@ import java.util.Date;
  *
 
  */
-@EqualsAndHashCode(callSuper = true)
+
 @Data
-public class AiAssistantQueryRequest extends PageRequest implements Serializable {
+public class AiAssistantQueryRequest  implements Serializable {
 
 
     /**

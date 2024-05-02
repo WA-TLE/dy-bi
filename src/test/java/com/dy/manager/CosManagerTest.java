@@ -12,11 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class CosManagerTest {
 
-    @Resource
-    private CosManager cosManager;
-
-    @Test
-    void putObject() {
-        cosManager.putObject("test", "test.json");
-    }
+//    @Resource
+//    private CosManager cosManager;
+//
+//    @Test
+//    void putObject() {
+//        cosManager.putObject("test", "test.json");
+//    }
 }

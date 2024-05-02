@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
  *
 
  */
-@Configuration
-@ConfigurationProperties(prefix = "cos.client")
+//@Configuration
+//@ConfigurationProperties(prefix = "cos.client")
 @Data
 public class CosClientConfig {
 

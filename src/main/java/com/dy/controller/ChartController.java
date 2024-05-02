@@ -2,16 +2,13 @@ package com.dy.controller;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dy.annotation.AuthCheck;
 import com.dy.common.*;
-import com.dy.constant.CommonConstant;
 import com.dy.constant.UserConstant;
 import com.dy.exception.BusinessException;
 import com.dy.exception.ThrowUtils;
 import com.dy.manager.AIManager;
-import com.dy.manager.CosManager;
 import com.dy.manager.RedissonManager;
 import com.dy.model.dto.chart.*;
 import com.dy.model.entity.Chart;
@@ -21,9 +18,7 @@ import com.dy.mq.MyMessageProducer;
 import com.dy.service.ChartService;
 import com.dy.service.UserService;
 import com.dy.utils.ExcelUtils;
-import com.dy.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -59,8 +54,7 @@ public class ChartController {
     @Resource
     private UserService userService;
 
-    @Resource
-    private CosManager cosManager;
+
 
     @Resource
     private AIManager aiManager;
@@ -317,6 +311,7 @@ public class ChartController {
         StringBuilder userInput = new StringBuilder();
 
         userInput.append("分析需求:").append(goal).append("\n");
+        userInput.append("请使用:").append(chartType).append("\n");
 
         // TODO: 2024/4/22 补充图表类型
 
@@ -407,6 +402,7 @@ public class ChartController {
         StringBuilder userInput = new StringBuilder();
 
         userInput.append("分析需求:").append(goal).append("\n");
+        userInput.append("请使用:").append(chartType).append("\n");
 
         // TODO: 2024/4/22 补充图表类型
 
@@ -519,6 +515,7 @@ public class ChartController {
         StringBuilder userInput = new StringBuilder();
 
         userInput.append("分析需求:").append(goal).append("\n");
+        userInput.append("请使用:").append(chartType).append("\n");
 
         // TODO: 2024/4/22 补充图表类型
 

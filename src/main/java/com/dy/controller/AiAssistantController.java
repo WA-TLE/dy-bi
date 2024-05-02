@@ -58,7 +58,7 @@ public class AiAssistantController {
         }
 
 
-        long modelId = 1654785040361893889L;
+        long modelId = 1785664780150362113L;
 
 
         String result = aiManager.doAssistant(modelId, questionGoal);

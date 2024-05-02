@@ -6,6 +6,7 @@ import com.yupi.yucongming.dev.client.YuCongMingClient;
 import com.yupi.yucongming.dev.common.BaseResponse;
 import com.yupi.yucongming.dev.model.DevChatRequest;
 import com.yupi.yucongming.dev.model.DevChatResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
  * @Description:
  */
 @Component
+@Slf4j
 public class AIManager {
 
     @Resource
@@ -58,7 +60,9 @@ public class AIManager {
 
         BaseResponse<DevChatResponse> response = client.doChat(devChatRequest);
 
-        ThrowUtils.throwIf(response == null, ErrorCode.SYSTEM_ERROR, "AI 相应错误");
+        log.info("response: {}", response);
+        log.info("response.getData: {}", response.getData());
+        ThrowUtils.throwIf(response == null || response.getData() == null, ErrorCode.SYSTEM_ERROR, "AI 相应错误");
 
 
         return response.getData().getContent();

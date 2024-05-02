@@ -1,43 +1,17 @@
 package com.dy.controller;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.dy.annotation.AuthCheck;
-import com.dy.common.BaseResponse;
-import com.dy.common.DeleteRequest;
-import com.dy.common.ErrorCode;
-import com.dy.common.ResultUtils;
-import com.dy.constant.UserConstant;
-import com.dy.exception.BusinessException;
-import com.dy.exception.ThrowUtils;
-import com.dy.manager.AIManager;
-import com.dy.manager.CosManager;
-import com.dy.manager.RedissonManager;
-import com.dy.model.dto.chart.*;
-import com.dy.model.entity.Chart;
-import com.dy.model.entity.User;
-import com.dy.model.vo.BiResponseVO;
-import com.dy.service.ChartService;
-import com.dy.service.UserService;
-import com.dy.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import static com.dy.constant.ChartConstant.GEN_CHART_BY_AI;
 
 /**
  * 帖子接口

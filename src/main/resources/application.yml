@@ -78,6 +78,17 @@ cos:
     secretKey: xxx
     region: xxx
     bucket: xxx
+
+oss:
+  client:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    accessKeyId: ${secret.client.accessKeyId}
+    accessKeySecret: ${secret.client.accessKeySecret}
+    bucketName: ${secret.client.bucketName}
+
+
+
+
 # 接口文档配置
 knife4j:
   enable: true
